@@ -1,0 +1,122 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Design.PreviewWith>
+		<Border Padding="20"></Border>
+	</Design.PreviewWith>
+
+	<Styles.Resources>
+
+		<!-- COLOR PALETTE -->
+		<Color x:Key="DarkOrangeHighLight">#ba6e03</Color>
+		<Color x:Key="DarkPrimary">#1A1A1A</Color>
+		<Color x:Key="DarkPanel">#262626</Color>
+		<Color x:Key="DarkSurface">#333333</Color>
+
+		<!-- Lime accent (darker) -->
+		<Color x:Key="DarkAccent">#B4D400</Color>        <!-- darker lime -->
+		<Color x:Key="DarkAccentSoft">#8FAA00</Color>    <!-- softer lime -->
+
+		<Color x:Key="DarkText">#E6E6E6</Color>
+		<Color x:Key="DarkTextDim">#A0A0A0</Color>
+
+		<!-- BRUSHES -->
+		<SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource DarkPrimary}" />
+		<SolidColorBrush x:Key="PanelBrush" Color="{StaticResource DarkPanel}" />
+		<SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource DarkSurface}" />
+		<SolidColorBrush x:Key="AccentBrush" Color="{StaticResource DarkAccent}" />
+		<SolidColorBrush x:Key="AccentSoftBrush" Color="{StaticResource DarkAccentSoft}" />
+		<SolidColorBrush x:Key="TextBrush" Color="{StaticResource DarkText}" />
+		<SolidColorBrush x:Key="TextDimBrush" Color="{StaticResource DarkTextDim}" />
+
+		<!-- ARROW FIX (universal) -->
+		<SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="{StaticResource DarkOrangeHighLight}" />
+
+		<!-- GRADIENTS -->
+
+		<LinearGradientBrush x:Key="PanelGradient" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#2A2A2A" Offset="0" />
+			<GradientStop Color="#1E1E1E" Offset="1" />
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="CardGradient" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#303030" Offset="0" />
+			<GradientStop Color="#242424" Offset="0.5" />
+			<GradientStop Color="#1A1A1A" Offset="1" />
+		</LinearGradientBrush>
+
+		<!-- Button normal -->
+		<LinearGradientBrush x:Key="ButtonGradient" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#3A3A3A" Offset="0" />
+			<GradientStop Color="#2A2A2A" Offset="1" />
+		</LinearGradientBrush>
+
+		<!-- Hover lime (darker) -->
+		<LinearGradientBrush x:Key="ButtonHoverGradient" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#C6EA00" Offset="0" />
+			<GradientStop Color="#A0C000" Offset="1" />
+		</LinearGradientBrush>
+
+		<!-- Pressed lime (even darker) -->
+		<LinearGradientBrush x:Key="ButtonPressedGradient" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Color="#A8CC00" Offset="0" />
+			<GradientStop Color="#7F9900" Offset="1" />
+		</LinearGradientBrush>
+
+	</Styles.Resources>
+
+	<!-- TEXTBLOCK -->
+	<Style Selector="TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+	</Style>
+
+	<!-- LABEL -->
+	<Style Selector="Label">
+		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+	</Style>
+
+	<!-- BORDER -->
+	<Style Selector="Border">
+		<Setter Property="Background" Value="{StaticResource CardGradient}" />
+		<Setter Property="BorderBrush" Value="{StaticResource SurfaceBrush}" />
+		<Setter Property="CornerRadius" Value="10" />
+		<Setter Property="Padding" Value="10" />
+	</Style>
+
+	<!-- BUTTON -->
+	<Style Selector="Button">
+		<Setter Property="Background" Value="{StaticResource ButtonGradient}" />
+		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+		<Setter Property="BorderBrush" Value="{StaticResource AccentSoftBrush}" />
+		<Setter Property="BorderThickness" Value="0.1" />
+		<Setter Property="Padding" Value="8,4" />
+		<Setter Property="CornerRadius" Value="4" />
+	</Style>
+
+	<!-- HOVER -->
+	<Style Selector="Button:pointerover">
+		<Setter Property="Background" Value="{StaticResource ButtonHoverGradient}" />
+	</Style>
+
+	<!-- PRESSED -->
+	<Style Selector="Button:pressed">
+		<Setter Property="Background" Value="{StaticResource ButtonPressedGradient}" />
+	</Style>
+
+	<!-- ACTIVE -->
+	<Style Selector="Button.active">
+		<Setter Property="Background" Value="{StaticResource ButtonPressedGradient}" />
+		<Setter Property="Foreground" Value="Black" />
+		<Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+		<Setter Property="BorderThickness" Value="0.5" />
+	</Style>
+
+	<!-- COMBOBOX -->
+	<Style Selector="ComboBox">
+		<Setter Property="Background" Value="{StaticResource PanelGradient}" />
+		<Setter Property="Foreground" Value="{StaticResource AccentBrush}" /> <!-- LIME -->
+		<Setter Property="BorderBrush" Value="{StaticResource AccentSoftBrush}" />
+	</Style>
+
+
+</Styles>

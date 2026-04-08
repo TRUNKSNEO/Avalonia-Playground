@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:MyAvalonia.ViewModels"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+		Width="1024" Height="600"
+		MinWidth="1024" MinHeight="600"
+		x:Class="MyAvalonia.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		xmlns:view="clr-namespace:MyAvalonia"
+		Icon="/Assets/Images/w_icon.ico"
+		Title="MyAvalonia">
+
+	<Design.DataContext>
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
+
+	<Grid Background="{DynamicResource ResourceKey=PrimaryBrush}" ColumnDefinitions="Auto, *">
+
+		<ContentControl Grid.Column="1" Content="{Binding Path=CurrentPage}" />
+
+
+		<Border Grid.Column="0" Padding="20" Background="{DynamicResource ResourceKey=PanelGradient}">
+			<Grid RowDefinitions="*, Auto">
+				<StackPanel Grid.Row="0" Spacing="12">
+
+					<Image PointerPressed="Image_PointerPressed" IsVisible="{Binding Path=SideMenuExpanded}" Source="{SvgImage /Assets/Images/w_logo.svg}" />
+					<Image PointerPressed="Image_PointerPressed" IsVisible="{Binding Path=!SideMenuExpanded}" Source="{SvgImage /Assets/Images/w_icon.svg}" Width="22" />
+
+					<Button Classes.active="{Binding Path=HomePageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToHomeCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE2C2;"> </Label>
+							<Label Content="Home" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+					<Button Classes.active="{Binding Path=ProcessPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToProcessCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}"  Classes="icon" Content="&#xe346;" > </Label>
+							<Label Content="Process" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+					<Button Classes.active="{Binding Path=ActionsPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToActionsCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE7F2;"> </Label>
+							<Label Content="Actions" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+					<Button Classes.active="{Binding Path=MacrosPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToMacrosCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE3EE;"> </Label>
+							<Label Content="Macros" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+					<Button Classes.active="{Binding Path=ReporterPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToReporterCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xEB7A;"> </Label>
+							<Label Content="Reporter" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+					<Button Classes.active="{Binding Path=HistoryPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToHistoryCommand}">
+						<StackPanel Orientation="Horizontal">
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE03A;"> </Label>
+							<Label Content="History" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
+						</StackPanel>
+					</Button>
+				</StackPanel>
+				<Button Grid.Row="1" Classes.active="{Binding Path=SettingsPageIsActive}" Command="{Binding GoToSettingsCommand}" FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE270;"/>
+
+			</Grid>
+		</Border>
+	</Grid>
+
+</Window>
