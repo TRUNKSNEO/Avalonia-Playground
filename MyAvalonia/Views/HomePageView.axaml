@@ -68,8 +68,6 @@
 											BorderThickness="1"
 											Width="230">
 
-
-
 										<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto"
 											  ColumnDefinitions="Auto,*"
 											  RowSpacing="6"
