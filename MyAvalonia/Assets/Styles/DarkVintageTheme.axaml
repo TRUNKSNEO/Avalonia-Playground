@@ -1,9 +1,5 @@
-<Styles xmlns="https://github.com/avaloniaui"
+﻿<Styles xmlns="https://github.com/avaloniaui"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-	<Design.PreviewWith>
-		<Border Padding="20"></Border>
-	</Design.PreviewWith>
 
 	<Styles.Resources>
 
@@ -13,9 +9,9 @@
 		<Color x:Key="DarkPanel">#262626</Color>
 		<Color x:Key="DarkSurface">#333333</Color>
 
-		<!-- Lime accent (darker) -->
-		<Color x:Key="DarkAccent">#B4D400</Color>        <!-- darker lime -->
-		<Color x:Key="DarkAccentSoft">#8FAA00</Color>    <!-- softer lime -->
+		<!-- Blue accent (darker) -->
+		<Color x:Key="DarkAccent">#4FC3F7</Color>
+		<Color x:Key="DarkAccentSoft">#81D4FA</Color>
 
 		<Color x:Key="DarkText">#E6E6E6</Color>
 		<Color x:Key="DarkTextDim">#A0A0A0</Color>
@@ -29,11 +25,10 @@
 		<SolidColorBrush x:Key="TextBrush" Color="{StaticResource DarkText}" />
 		<SolidColorBrush x:Key="TextDimBrush" Color="{StaticResource DarkTextDim}" />
 
-		<!-- ARROW FIX (universal) -->
-		<SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="{StaticResource DarkOrangeHighLight}" />
+		<!-- ARROW FIX -->
+		<SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="{StaticResource DarkAccent}" />
 
 		<!-- GRADIENTS -->
-
 		<LinearGradientBrush x:Key="PanelGradient" StartPoint="0,0" EndPoint="0,1">
 			<GradientStop Color="#2A2A2A" Offset="0" />
 			<GradientStop Color="#1E1E1E" Offset="1" />
@@ -51,19 +46,20 @@
 			<GradientStop Color="#2A2A2A" Offset="1" />
 		</LinearGradientBrush>
 
-		<!-- Hover lime (darker) -->
+		<!-- Hover lime -->
 		<LinearGradientBrush x:Key="ButtonHoverGradient" StartPoint="0,0" EndPoint="0,1">
 			<GradientStop Color="#C6EA00" Offset="0" />
 			<GradientStop Color="#A0C000" Offset="1" />
 		</LinearGradientBrush>
 
-		<!-- Pressed lime (even darker) -->
+		<!-- Pressed lime -->
 		<LinearGradientBrush x:Key="ButtonPressedGradient" StartPoint="0,0" EndPoint="0,1">
 			<GradientStop Color="#A8CC00" Offset="0" />
 			<GradientStop Color="#7F9900" Offset="1" />
 		</LinearGradientBrush>
 
 	</Styles.Resources>
+
 
 	<!-- TEXTBLOCK -->
 	<Style Selector="TextBlock">
@@ -72,18 +68,18 @@
 
 	<!-- LABEL -->
 	<Style Selector="Label">
-		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+		<Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
 	</Style>
 
-	<!-- BORDER -->
+	<!-- BORDER GLOBAL -->
 	<Style Selector="Border">
 		<Setter Property="Background" Value="{StaticResource CardGradient}" />
-		<Setter Property="BorderBrush" Value="{StaticResource SurfaceBrush}" />
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="Padding" Value="10" />
 	</Style>
 
-	<!-- BUTTON -->
+
+	<!-- BUTTON BASE -->
 	<Style Selector="Button">
 		<Setter Property="Background" Value="{StaticResource ButtonGradient}" />
 		<Setter Property="Foreground" Value="{StaticResource TextBrush}" />
@@ -95,7 +91,7 @@
 
 	<!-- HOVER -->
 	<Style Selector="Button:pointerover">
-		<Setter Property="Background" Value="{StaticResource ButtonHoverGradient}" />
+		<Setter Property="Background" Value="{StaticResource DarkAccentSoft}" />
 	</Style>
 
 	<!-- PRESSED -->
@@ -103,20 +99,57 @@
 		<Setter Property="Background" Value="{StaticResource ButtonPressedGradient}" />
 	</Style>
 
+	<!-- PRESSED TEXT FIX -->
+	<Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="TextElement.Foreground" Value="Black" />
+	</Style>
+
 	<!-- ACTIVE -->
 	<Style Selector="Button.active">
-		<Setter Property="Background" Value="{StaticResource ButtonPressedGradient}" />
-		<Setter Property="Foreground" Value="Black" />
+		<Setter Property="Background" Value="{StaticResource DarkAccent}" />
 		<Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
 		<Setter Property="BorderThickness" Value="0.5" />
+	</Style>
+
+	<!-- ACTIVE TEXT FIX -->
+	<Style Selector="Button.active Label">
+		<Setter Property="Foreground" Value="{StaticResource DarkPrimary}" />
+	</Style>
+
+	<Style Selector="Button.active Label.icon">
+		<Setter Property="Foreground" Value="{StaticResource DarkPrimary}" />
+	</Style>
+
+	<!-- ACTIVE + HOVER TEXT -->
+	<Style Selector="Button.active:pointerover Label">
+		<Setter Property="Foreground" Value="{StaticResource DarkAccentSoft}" />
+	</Style>
+
+	<Style Selector="Button.active:pointerover Label.icon">
+		<Setter Property="Foreground" Value="{StaticResource DarkAccentSoft}" />
 	</Style>
 
 	<!-- COMBOBOX -->
 	<Style Selector="ComboBox">
 		<Setter Property="Background" Value="{StaticResource PanelGradient}" />
-		<Setter Property="Foreground" Value="{StaticResource AccentBrush}" /> <!-- LIME -->
+		<Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
 		<Setter Property="BorderBrush" Value="{StaticResource AccentSoftBrush}" />
 	</Style>
 
+
+	<!-- CARDS -->
+	<Style Selector="Border.card">
+		<Setter Property="BorderBrush" Value="#333" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="Transitions">
+			<Transitions>
+				<BrushTransition Property="BorderBrush" Duration="0:0:0.20"/>
+			</Transitions>
+		</Setter>
+	</Style>
+
+	<Style Selector="Border.card:pointerover">
+		<Setter Property="BorderBrush" Value="{StaticResource DarkAccent}" />
+	</Style>
 
 </Styles>
