@@ -36,4 +36,5 @@ public partial class HomePageView : UserControl
 	{
 		await SmoothScroll(200);
 	}
+
 }

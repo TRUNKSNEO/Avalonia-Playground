@@ -138,9 +138,14 @@
 
 
 	<!-- CARDS -->
-	<Style Selector="Border.card">
+	<Style Selector="Button.card">
+		<Setter Property="Background" Value="{StaticResource CardGradient}" />
 		<Setter Property="BorderBrush" Value="#333" />
 		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="CornerRadius" Value="12" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Stretch" />
 		<Setter Property="Transitions">
 			<Transitions>
 				<BrushTransition Property="BorderBrush" Duration="0:0:0.20"/>
@@ -148,8 +153,7 @@
 		</Setter>
 	</Style>
 
-	<Style Selector="Border.card:pointerover">
+	<Style Selector="Button.card:pointerover">
 		<Setter Property="BorderBrush" Value="{StaticResource DarkAccent}" />
 	</Style>
-
 </Styles>

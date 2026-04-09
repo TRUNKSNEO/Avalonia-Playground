@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MyAvalonia.Data;
 using MyAvalonia.Integrations.Interfaces;
 using MyAvalonia.Models.Forecast;
@@ -24,12 +25,17 @@ namespace MyAvalonia.ViewModels
 
 		[ObservableProperty]
 		private LocationDto _selectedLocation;
+
+		[ObservableProperty]
+		private string _locationName = string.Empty;
+
 		public ObservableCollection<LocationDto> Locations { get; set; } = new();
 		public ObservableCollection<ForecastItemDto> Forecasts { get; } = new();
 
 		private List<WeatherTypeDto> WeatherTypes { get; set; } = new();
 
 		private List<WindSpeedDto> WindSpeeds { get; set; } = new();
+
 
 		public HomePageViewModel(IIpmaService apiClient, IMapper mapper)
 		{
@@ -40,6 +46,7 @@ namespace MyAvalonia.ViewModels
 			_ = LoadWindAsync();
 			_ = LoadLocationsAsync();
 			_ = LoadWeatherTypesAsync();
+
 		}
 
 		public HomePageViewModel()
@@ -68,10 +75,24 @@ namespace MyAvalonia.ViewModels
 			}
 		}
 
+		[RelayCommand]
+		private async Task SelectStuff(ForecastItemDto item)
+		{
+			if (item == null)
+				return;
+
+			//// chamada à API
+			//var details = await _apiClient.GetForecastByDayAsync(item.Date);
+
+			//// guardar resultado
+			//SelectedForecastDetails = details;
+		}
+
 		partial void OnSelectedLocationChanged(LocationDto value)
 		{
 			if (value != null)
 			{
+				LocationName = value.Name;
 				_ = LoadForecastAsync(value.GlobalIdLocal);
 			}
 		}
