@@ -7,7 +7,11 @@
 			 x:Class="MyAvalonia.Views.WeatherForecast.WeatherForecastList"
 			 x:DataType="vm:WeatherForecastPageViewModel"
 			 xmlns:local="clr-namespace:MyAvalonia.Models.Forecast"
-			 xmlns:awarness="clr-namespace:MyAvalonia.Models.Awarness">
+			 xmlns:awarness="clr-namespace:MyAvalonia.Models.Awarness"
+			 Background="{StaticResource PrimaryBrush}">
+	<Design.DataContext>
+		<vm:WeatherForecastPageViewModel />
+	</Design.DataContext>
 
 	<TabControl TabStripPlacement="Left"
 				Classes="modern"
@@ -20,14 +24,10 @@
 				<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" Margin="6">
 
 					<!-- Icon -->
-					<Label Grid.Row="0"
-						   Grid.RowSpan="2"
-						   Grid.Column="0"
-						   FontFamily="{DynamicResource PhosphorFill}"
-						   Classes="icon"
-						   Content="{Binding WeatherInformation.WeatherIcon}"
-						   VerticalAlignment="Center"
-						   Margin="0,0,8,0"/>
+					<Svg Path="{Binding WeatherInformation.WeatherIconPath}"
+						 Width="20"
+						 Height="20"
+						 Margin="0,0,5,0"/>
 
 					<!-- WeekDay -->
 					<TextBlock Grid.Row="0"

@@ -10,7 +10,8 @@
 		x:DataType="vm:MainWindowViewModel"
 		xmlns:view="clr-namespace:MyAvalonia"
 		Icon="/Assets/Images/w_icon.ico"
-		Title="MyAvalonia">
+		Title="MyAvalonia"
+		Background="{StaticResource PrimaryBrush}">
 
 	<Design.DataContext>
 		<vm:MainWindowViewModel/>

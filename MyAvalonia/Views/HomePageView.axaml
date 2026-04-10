@@ -88,10 +88,10 @@
 														   FontSize="15"
 														   FontWeight="Bold"/>
 
-												<Label Grid.Column="1"
-													   FontFamily="{DynamicResource PhosphorFill}"
-													   Classes="icon"
-													   Content="{Binding WeatherInformation.WeatherIcon}" />
+												<!--<Label Grid.Column="1"
+												FontFamily="{DynamicResource PhosphorFill}"
+												Classes="icon"
+												Content="{Binding WeatherInformation.WeatherIcon}" />-->
 											</Grid>
 
 											<TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
