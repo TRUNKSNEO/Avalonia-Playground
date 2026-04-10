@@ -1,0 +1,168 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:MyAvalonia.ViewModels"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="MyAvalonia.Views.WeatherForecast.WeatherForecastList"
+			 x:DataType="vm:WeatherForecastPageViewModel"
+			 xmlns:local="clr-namespace:MyAvalonia.Models.Forecast"
+			 xmlns:awarness="clr-namespace:MyAvalonia.Models.Awarness">
+
+	<TabControl TabStripPlacement="Left"
+				Classes="modern"
+				ItemsSource="{Binding Forecasts}"
+				SelectedItem="{Binding SelectedTab}">
+
+		<!-- ================= TAB HEADER ================= -->
+		<TabControl.ItemTemplate>
+			<DataTemplate x:DataType="local:ForecastItemDto">
+				<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" Margin="6">
+
+					<!-- Icon -->
+					<Label Grid.Row="0"
+						   Grid.RowSpan="2"
+						   Grid.Column="0"
+						   FontFamily="{DynamicResource PhosphorFill}"
+						   Classes="icon"
+						   Content="{Binding WeatherInformation.WeatherIcon}"
+						   VerticalAlignment="Center"
+						   Margin="0,0,8,0"/>
+
+					<!-- WeekDay -->
+					<TextBlock Grid.Row="0"
+							   Grid.Column="1"
+							   Text="{Binding WeekDay}"
+							   FontWeight="SemiBold"/>
+
+					<!-- Date -->
+					<TextBlock Grid.Row="1"
+							   Grid.Column="1"
+							   Text="{Binding Date}"
+							   FontSize="11"
+							   Opacity="0.7"/>
+
+				</Grid>
+			</DataTemplate>
+		</TabControl.ItemTemplate>
+
+		<!-- ================= CONTENT ================= -->
+		<TabControl.ContentTemplate>
+			<DataTemplate x:DataType="local:ForecastItemDto">
+
+				<Border Padding="16"
+						Margin="10"
+						CornerRadius="12"
+						Background="#1E1E1E">
+
+					<ScrollViewer VerticalScrollBarVisibility="Auto"
+								  HorizontalScrollBarVisibility="Disabled"
+								  AllowAutoHide="True">
+						<StackPanel Spacing="16">
+
+							<!-- ================= FORECAST ================= -->
+							<StackPanel Spacing="10">
+
+								<!-- Título da Secção -->
+								<TextBlock Text="Previsão"
+										   FontSize="18"
+										   FontWeight="SemiBold"/>
+
+								<Border Background="#252525" Padding="15" CornerRadius="8">
+									<StackPanel Spacing="20">
+
+										<!-- SECÇÃO: TEMPERATURA -->
+										<StackPanel Spacing="8">
+											<TextBlock Text="Temperatura" FontSize="12" FontWeight="Bold"  Opacity="0.8"/>
+											<Border Background="#2A2A2A" Padding="12" CornerRadius="8">
+												<Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
+													<TextBlock Grid.Column="0" Text="Mínima" Opacity="0.5" Margin="0,0,10,0"/>
+													<TextBlock Grid.Column="1" Text="{Binding TemperatureMin, StringFormat='\{0\}°C'}" FontWeight="Medium"/>
+
+													<TextBlock Grid.Column="2" Text="Máxima" Opacity="0.5" Margin="20,0,10,0"/>
+													<TextBlock Grid.Column="3" Text="{Binding TemperatureMax, StringFormat='\{0\}°C'}" FontWeight="Medium"/>
+												</Grid>
+											</Border>
+										</StackPanel>
+
+										<!-- SECÇÃO: VENTO -->
+										<StackPanel Spacing="8">
+											<TextBlock Text="Vento" FontSize="12" FontWeight="Bold"  Opacity="0.8"/>
+											<Border Background="#2A2A2A" Padding="12" CornerRadius="8">
+												<Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
+													<TextBlock Grid.Column="0" Text="Intensidade" Opacity="0.5" Margin="0,0,10,0"/>
+													<TextBlock Grid.Column="1" Text="{Binding WindInformation.DescriptionPT}"/>
+
+													<TextBlock Grid.Column="2" Text="Direção" Opacity="0.5" Margin="20,0,10,0"/>
+													<TextBlock Grid.Column="3" Text="{Binding PredictedWindDirection}"/>
+												</Grid>
+											</Border>
+										</StackPanel>
+
+										<!-- SECÇÃO: PRECIPITAÇÃO -->
+										<StackPanel Spacing="8">
+											<TextBlock Text="Precipitação" FontSize="12" FontWeight="Bold"  Opacity="0.8"/>
+											<Border Background="#2A2A2A" Padding="12" CornerRadius="8">
+												<Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
+													<TextBlock Grid.Column="0" Text="Intensidade" Opacity="0.5" Margin="0,0,10,0"/>
+													<TextBlock Grid.Column="1" Text="{Binding PrecipitationIntensityClass}"/>
+
+													<TextBlock Grid.Column="2" Text="Probabilidade" Opacity="0.5" Margin="20,0,10,0"/>
+													<TextBlock Grid.Column="3" Text="{Binding PrecipitationProbability, StringFormat='\{0\}%'}"/>
+												</Grid>
+											</Border>
+										</StackPanel>
+
+									</StackPanel>
+								</Border>
+							</StackPanel>
+
+							<!-- ================= AWARENESS ================= -->
+							<StackPanel IsVisible="{Binding HasAwareness}" Spacing="10">
+
+								<TextBlock Text="Avisos"
+										   FontSize="16"
+										   FontWeight="Bold"/>
+
+								<ItemsControl ItemsSource="{Binding AwarnessInformation}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate x:DataType="awarness:AwarnessItemDto">
+											<Border Padding="10"
+													CornerRadius="8"
+													Background="#2A2A2A"
+													Margin="0,4"
+													BorderThickness="0.6"
+													BorderBrush="{Binding LevelBrush}">
+
+												<StackPanel Spacing="4">
+
+													<TextBlock Text="{Binding Type}"
+															   FontWeight="SemiBold"/>
+
+													<TextBlock Text="{Binding DisplayLevel}"
+															   Opacity="0.8"/>
+
+													<TextBlock Text="{Binding Period}"
+															   FontSize="12"
+															   Opacity="0.7"/>
+
+												</StackPanel>
+
+											</Border>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+
+							</StackPanel>
+
+						</StackPanel>
+					</ScrollViewer>
+
+				</Border>
+
+			</DataTemplate>
+		</TabControl.ContentTemplate>
+
+	</TabControl>
+
+</UserControl>

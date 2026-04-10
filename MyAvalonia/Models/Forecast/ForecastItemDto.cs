@@ -32,12 +32,12 @@ namespace MyAvalonia.Models.Forecast
 
 		public string Longitude { get; set; } = String.Empty;
 
-		public string TemperatureDisplay => $"{TemperatureMin}º / {TemperatureMax}º";
-
 		public WeatherTypeDto WeatherInformation { get; set; } = new();
 
 		public WindSpeedDto WindInformation { get; set; } = new();
 
 		public List<AwarnessItemDto> AwarnessInformation { get; set; } = new();
+
+		public bool HasAwareness => AwarnessInformation?.Count > 0;
 	}
 }

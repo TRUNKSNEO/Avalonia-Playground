@@ -99,8 +99,8 @@
 
 											<TextBlock Grid.Row="2" Grid.Column="0"
 													   Text="Temperature:" Opacity="0.7"/>
-											<TextBlock Grid.Row="2" Grid.Column="1"
-													   Text="{Binding TemperatureDisplay}"/>
+											<!--<TextBlock Grid.Row="2" Grid.Column="1"
+											Text="{Binding TemperatureDisplay}"/>-->
 
 											<TextBlock Grid.Row="3" Grid.Column="0"
 													   Text="Wind:" Opacity="0.7"/>
