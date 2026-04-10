@@ -11,9 +11,13 @@
 		<Color x:Key="DarkPanel">#262626</Color>
 		<Color x:Key="DarkSurface">#333333</Color>
 
-		<!-- Blue accent (darker) -->
+		<!-- Lime accent (darker) -->
+		<Color x:Key="DarkAccent">#B4D400</Color>        <!-- darker lime -->
+		<Color x:Key="DarkAccentSoft">#8FAA00</Color>    <!-- softer lime -->
+		<!-- Blue accent (darker) --><!--
+
 		<Color x:Key="DarkAccent">#4FC3F7</Color>
-		<Color x:Key="DarkAccentSoft">#81D4FA</Color>
+		<Color x:Key="DarkAccentSoft">#81D4FA</Color>-->
 		<Color x:Key="DarkAccentOrange">#D67A1F</Color>
 
 
