@@ -28,6 +28,7 @@
 			<PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+		<PackageReference Include="FluentAvalonia.ProgressRing" Version="1.69.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
 		<PackageReference Include="Svg.Controls.Avalonia" Version="11.3.9.5" />
 	</ItemGroup>
