@@ -8,7 +8,7 @@
 			 x:DataType="vm:WeatherForecastPageViewModel"
 			 xmlns:local="clr-namespace:MyAvalonia.Models.Forecast"
 			 xmlns:awarness="clr-namespace:MyAvalonia.Models.Awarness"
-			 Background="{StaticResource PrimaryBrush}">
+			 Background="{DynamicResource ResourceKey=PanelGradient}">
 	<Design.DataContext>
 		<vm:WeatherForecastPageViewModel />
 	</Design.DataContext>
@@ -53,7 +53,7 @@
 				<Border Padding="16"
 						Margin="10"
 						CornerRadius="12"
-						Background="{StaticResource SecondaryBrush}">
+						Background="{DynamicResource ResourceKey=PanelGradient}">
 
 					<ScrollViewer VerticalScrollBarVisibility="Auto"
 								  HorizontalScrollBarVisibility="Disabled"
@@ -91,7 +91,7 @@
 											<Border Background="{StaticResource SurfaceBrush}" Padding="12" CornerRadius="8">
 												<Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
 													<TextBlock Grid.Column="0" Text="Intensity" Opacity="0.5" Margin="0,0,10,0"/>
-													<TextBlock Grid.Column="1" Text="{Binding WindInformation.DescriptionPT}"/>
+													<TextBlock Grid.Column="1" Text="{Binding WindInformation.DescriptionEN}"/>
 
 													<TextBlock Grid.Column="2" Text="Direction" Opacity="0.5" Margin="20,0,10,0"/>
 													<TextBlock Grid.Column="3" Text="{Binding PredictedWindDirection}"/>

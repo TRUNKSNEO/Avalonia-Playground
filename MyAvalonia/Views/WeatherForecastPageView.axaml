@@ -12,17 +12,17 @@
 			 x:DataType="vm:WeatherForecastPageViewModel"
 			 xmlns:local="clr-namespace:MyAvalonia.Models.Forecast"
 			 xmlns:awarness="clr-namespace:MyAvalonia.Models.Awarness"
-			 Background="{StaticResource PrimaryBrush}">
+			 Background="{DynamicResource ResourceKey=PanelGradient}">
 
 	<Grid RowDefinitions="100,*">
-		<Border Grid.Row="0" Padding="20">
+		<Border Grid.Row="0" Background="{DynamicResource ResourceKey=PanelGradient}" Padding="20">
 			<StackPanel Spacing="10">
 
 				<StackPanel Orientation="Horizontal">
 					<TextBlock Text="Weather Forecast!" FontSize="18" />
 				</StackPanel>
 
-				<StackPanel IsVisible="{Binding !ProgressControl.IsVisible}" Orientation="Horizontal">
+				<StackPanel Orientation="Horizontal">
 					<TextBlock Text="Select location" FontSize="18" Margin="0,5,5,0" />
 					<ComboBox Width="200"
 							  ItemsSource="{Binding Locations}"
@@ -38,11 +38,11 @@
 				</StackPanel>
 			</StackPanel>
 		</Border>
-		<Border Grid.Row="1" IsVisible="{Binding ProgressControl.IsVisible}">
+		<Border Grid.Row="1" Padding="0" IsVisible="{Binding ProgressControl.IsVisible}">
 			<pg:ProgressControl DataContext="{Binding ProgressControl}" />
 		</Border>
 
-		<Border Grid.Row="1" IsVisible="{Binding !ProgressControl.IsVisible}">
+		<Border Grid.Row="1" Padding="0" IsVisible="{Binding !ProgressControl.IsVisible}">
 			<wf:WeatherForecastList />
 		</Border>
 	</Grid>
