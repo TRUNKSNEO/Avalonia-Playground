@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Avalonia.Controls;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MyAvalonia.Data;
 using MyAvalonia.Integrations.Exceptions;
@@ -9,6 +8,7 @@ using MyAvalonia.Interfaces;
 using MyAvalonia.Models.Awarness;
 using MyAvalonia.Models.Forecast;
 using MyAvalonia.Models.Locations;
+using MyAvalonia.Models.Precipitation;
 using MyAvalonia.Models.Weather;
 using MyAvalonia.Models.Wind;
 using MyAvalonia.ViewModels.ProgressControl;
@@ -26,7 +26,11 @@ namespace MyAvalonia.ViewModels
 		private readonly IMapper _mapper;
 		private readonly IIpmaService _apiClient;
 		private readonly IMessageService _messageService;
-		public Window? OwnerWindow { get; set; }
+
+		private List<WeatherTypeDto> WeatherTypes { get; set; } = new();
+		private List<WindSpeedDto> WindSpeeds { get; set; } = new();
+		private List<AwarnessItemDto> AwarnessTypes { get; set; } = new();
+		private List<PrecipitationDto> PrecepitationTypes { get; set; } = new();
 
 		[ObservableProperty]
 		private ProgressControlViewModel _progressControl = new();
@@ -35,19 +39,18 @@ namespace MyAvalonia.ViewModels
 		private ForecastItemDto? _selectedTab;
 
 		[ObservableProperty]
-		private LocationDto _selectedLocation;
+		private LocationDto? _selectedLocation;
 
 		[ObservableProperty]
 		private AwarnessItemDto _awarness;
+
+
+		public Window? OwnerWindow { get; set; }
 
 		public ObservableCollection<LocationDto> Locations { get; } = new();
 
 		public ObservableCollection<ForecastItemDto> Forecasts { get; } = new();
 
-		private List<WeatherTypeDto> WeatherTypes { get; set; } = new();
-		private List<WindSpeedDto> WindSpeeds { get; set; } = new();
-
-		private List<AwarnessItemDto> AwarnessTypes { get; set; } = new();
 
 		// =========================
 		// RUNTIME CONSTRUCTOR
@@ -73,6 +76,7 @@ namespace MyAvalonia.ViewModels
 
 				// 2. Execute all initial data loads in parallel for better performance
 				await Task.WhenAll(
+					LoadPrecipitationAsync(),
 					LoadWindAsync(),
 					LoadLocationsAsync(),
 					LoadWeatherTypesAsync(),
@@ -144,6 +148,30 @@ namespace MyAvalonia.ViewModels
 					WeatherInformation = WeatherTypes[1]
 				});
 
+				AwarnessTypes = new List<AwarnessItemDto>
+				{
+					new AwarnessItemDto
+					{
+						Area = "Braga",
+						Type = "Wind",
+						Level = "Yellow",
+						StartTime = DateTime.Now.AddHours(-1),
+						EndTime = DateTime.Now.AddHours(5),
+						Text = "Strong winds expected in the area."
+					},
+
+					new AwarnessItemDto
+					{
+						Area = "Braga",
+						Type = "Wind",
+						Level = "Red",
+						StartTime = DateTime.Now.AddHours(-1),
+						EndTime = DateTime.Now.AddHours(5),
+						Text = "Strong winds expected in the area."
+					}
+				};
+
+				Forecasts[0].AwarnessInformation.AddRange(AwarnessTypes);
 				SelectedLocation = Locations.First();
 				SelectedTab = Forecasts.First();
 
@@ -154,11 +182,12 @@ namespace MyAvalonia.ViewModels
 		// =========================
 		// EVENTS
 		// =========================
-		partial void OnSelectedLocationChanged(LocationDto value)
+		partial void OnSelectedLocationChanged(LocationDto? value)
 		{
-			if (value == null || Design.IsDesignMode) return;
-
-			_ = LoadDataOrchestratorAsync(value);
+			if (value != null)
+			{
+				_ = LoadDataOrchestratorAsync(value);
+			}
 		}
 
 		private async Task LoadDataOrchestratorAsync(LocationDto value)
@@ -211,6 +240,18 @@ namespace MyAvalonia.ViewModels
 			}
 		}
 
+		private async Task LoadPrecipitationAsync()
+		{
+			WindSpeeds.Clear();
+			var response = await _apiClient.GetPrecipitationTypesAsync();
+
+			if (response?.Data != null)
+			{
+				var mapped = _mapper.Map<List<PrecipitationDto>>(response.Data);
+				foreach (var item in mapped) PrecepitationTypes.Add(item);
+			}
+		}
+
 		private async Task LoadLocationsAsync()
 		{
 			Locations.Clear();
@@ -219,7 +260,14 @@ namespace MyAvalonia.ViewModels
 			if (response?.Data != null)
 			{
 				var mapped = _mapper.Map<List<LocationDto>>(response.Data);
-				foreach (var item in mapped) Locations.Add(item);
+
+				// Ordena apenas por nome para ser fácil de encontrar
+				var ordered = mapped.OrderBy(x => x.Name).ToList();
+
+				foreach (var item in ordered)
+				{
+					Locations.Add(item);
+				}
 			}
 		}
 
@@ -248,14 +296,30 @@ namespace MyAvalonia.ViewModels
 				foreach (var item in mapped)
 				{
 					// Map metadata from previously loaded collections
-					item.WeatherInformation = WeatherTypes.FirstOrDefault(x => x.IdWeatherType == item.WeatherTypeId);
-					item.WindInformation = WindSpeeds.FirstOrDefault(x => x.ClassWindSpeedValue == item.WindSpeedClass);
+					// Weather
+					item.WeatherInformation = WeatherTypes.FirstOrDefault(x => x.IdWeatherType == item.WeatherTypeId)
+						?? new WeatherTypeDto { DescriptionPT = "Unknown" };
+
+					// Wind
+					item.WindInformation = WindSpeeds.FirstOrDefault(x => x.ClassWindSpeedValue == item.WindSpeedClass)
+						?? new WindSpeedDto { DescriptionPT = "N/A" };
+
+					// Precipitation
+					item.PrecipitationInformation = PrecepitationTypes.FirstOrDefault(x => x.IntensityLevel == item.PrecipitationIntensityClass)
+						?? new PrecipitationDto { DescriptionPT = "---", IntensityLevel = -99 };
 
 					// Link awareness alerts to this specific forecast day/area
 					item.AwarnessInformation = AwarnessTypes
-					   .Where(a => item.Date >= a.StartTime &&
-								   item.Date <= a.EndTime &&
-								   SelectedLocation?.IdAreaAviso == a.Area)
+					   .Where(a =>
+					   {
+						   if (SelectedLocation is LocationDto selectedCity)
+						   {
+							   return item.Date.Date >= a.StartTime.Date &&
+									  item.Date.Date <= a.EndTime.Date &&
+									  selectedCity.IdAreaAviso == a.Area;
+						   }
+						   return false;
+					   })
 					   .ToList();
 
 					tempList.Add(item);

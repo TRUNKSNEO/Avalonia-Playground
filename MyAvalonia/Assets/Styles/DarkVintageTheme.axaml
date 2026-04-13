@@ -142,9 +142,24 @@
 	<Style Selector="ComboBox">
 		<Setter Property="Background" Value="{StaticResource ButtonGradient}" />
 		<Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
-		<Setter Property="BorderBrush" Value="{StaticResource DarkPanel}" />
+		
 	</Style>
 
+	<Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter"> 
+		<Setter Property="Background" Value="{DynamicResource DarkAccentSoft}" /> 
+	</Style> 
+
+	<Style Selector="ComboBoxItem:pointerover TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource DarkPrimary}" />
+	</Style>
+
+	<Style Selector="ComboBoxItem:selected /template/ ContentPresenter"> 
+		<Setter Property="Background" Value="{DynamicResource PrimaryBrush}" /> 
+	</Style> 
+
+	<Style Selector="ComboBoxItem:selected TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource DarkAccent}" />
+	</Style>
 
 	<!-- TAB ITEM = MESMO ESTILO DOS CARDS -->
 	<Style Selector="TabControl.modern TabItem">

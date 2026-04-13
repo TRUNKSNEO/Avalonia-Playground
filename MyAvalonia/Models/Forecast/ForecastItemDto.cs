@@ -1,4 +1,5 @@
 ﻿using MyAvalonia.Models.Awarness;
+using MyAvalonia.Models.Precipitation;
 using MyAvalonia.Models.Weather;
 using MyAvalonia.Models.Wind;
 using System;
@@ -37,6 +38,7 @@ namespace MyAvalonia.Models.Forecast
 		public WindSpeedDto WindInformation { get; set; } = new();
 
 		public List<AwarnessItemDto> AwarnessInformation { get; set; } = new();
+		public PrecipitationDto PrecipitationInformation { get; set; } = new();
 
 		public bool HasAwareness => AwarnessInformation?.Count > 0;
 	}

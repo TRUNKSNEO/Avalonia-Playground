@@ -23,10 +23,10 @@ namespace MyAvalonia.Models.Awarness
 			{
 				return Level?.ToLower() switch
 				{
-					"green" => "Verde",
-					"yellow" => "Amarelo",
-					"orange" => "Laranja",
-					"red" => "Vermelho",
+					"green" => "Green",
+					"yellow" => "Yellow",
+					"orange" => "Orange",
+					"red" => "Red",
 					_ => Level
 				};
 			}

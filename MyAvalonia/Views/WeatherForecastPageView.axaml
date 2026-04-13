@@ -24,14 +24,13 @@
 
 				<StackPanel IsVisible="{Binding !ProgressControl.IsVisible}" Orientation="Horizontal">
 					<TextBlock Text="Select location" FontSize="18" Margin="0,5,5,0" />
-
 					<ComboBox Width="200"
 							  ItemsSource="{Binding Locations}"
 							  SelectedItem="{Binding SelectedLocation}">
 						<ComboBox.ItemTemplate>
 							<DataTemplate>
 								<StackPanel>
-									<TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+									<TextBlock Text="{Binding Name}"/>
 								</StackPanel>
 							</DataTemplate>
 						</ComboBox.ItemTemplate>
