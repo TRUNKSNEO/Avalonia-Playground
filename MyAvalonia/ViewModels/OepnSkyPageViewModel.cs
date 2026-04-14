@@ -207,6 +207,8 @@ namespace MyAvalonia.ViewModels
 
                 var altitude = plane.Altitude?.ToString("F0") ?? "N/A";
                 var velocity = plane.Velocity?.ToString("F0") ?? "N/A";
+                var origin = plane.OriginCountry ?? "Unknown";
+                var onGround = plane.OnGround == true ? "Yes" : "No";
 
                 var color = plane.Altitude switch
                 {
@@ -215,8 +217,7 @@ namespace MyAvalonia.ViewModels
                     _ => Color.Red
                 };
 
-                var infoText =
-                    $"{callsign}\nAlt: {altitude}\nVel: {velocity}";
+                var infoText = $"CallSign: {callsign}\nOrigin: {origin}\nAlt: {altitude}\nVel: {velocity}\nOnGround: {onGround}\n";
 
                 if (plane.TrueTrack != null)
                 {
