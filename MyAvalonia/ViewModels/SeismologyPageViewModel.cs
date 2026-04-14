@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Avalonia.Controls;
+using BruTile.Predefined;
+using BruTile.Web;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
 using Mapsui.Projections;
 using Mapsui.Styles;
+using Mapsui.Tiling.Layers;
 using MyAvalonia.Data;
 using MyAvalonia.Integrations.Interfaces;
 using MyAvalonia.Interfaces;
@@ -19,225 +22,307 @@ using static MyAvalonia.ViewModels.MessageDialog.MessageDialogBoxViewModel;
 
 namespace MyAvalonia.ViewModels
 {
-	public partial class SeismologyPageViewModel : PageViewModel
-	{
-		private readonly IMapper _mapper;
-		private readonly IIpmaService _apiClient;
-		private readonly IMessageService _messageService;
+    public partial class SeismologyPageViewModel : PageViewModel
+    {
+        #region Fields
 
-		[ObservableProperty]
-		private Mapsui.Map _map;
+        private readonly IMapper _mapper;
+        private readonly IIpmaService _apiClient;
+        private readonly IMessageService _messageService;
 
-		[ObservableProperty]
-		private DateTime _maxDate = DateTime.Now;
+        private TileLayer? _baseLayer;
+        private TileLayer? _labelLayer;
 
-		[ObservableProperty]
-		private DateTime _minDate = DateTime.Now.AddDays(-30);
+        private bool _isDarkTheme = false;
 
-		[ObservableProperty]
-		private DateTime _selectedDate = DateTime.Now;
+        private List<SeismicActivityDto> SeismicActivities { get; set; } = new();
 
-		[ObservableProperty]
-		private ProgressControlViewModel _progressControl = new();
+        #endregion
 
-		private List<SeismicActivityDto> SeismicActivities { get; set; } = new();
+        #region Properties
 
-		public SeismologyPageViewModel(ProgressControlViewModel progressControl, IMessageService messageService, IIpmaService apiClient, IMapper mapper)
-		{
-			PageName = ApplicationPageNames.Seismology;
-			_progressControl = progressControl;
-			_messageService = messageService;
-			_mapper = mapper;
-			_apiClient = apiClient;
+        [ObservableProperty]
+        private Mapsui.Map _map;
 
-			// Initialize map object immediately
-			Map = new Mapsui.Map();
-			_ = InitializeAsync();
-		}
+        [ObservableProperty]
+        private DateTime _maxDate = DateTime.Now;
 
-		public SeismologyPageViewModel()
-		{
-			if (Design.IsDesignMode)
-			{
-				Map = new Mapsui.Map();
-				PageName = ApplicationPageNames.Seismology;
-			}
-		}
+        [ObservableProperty]
+        private DateTime _minDate = DateTime.Now.AddDays(-30);
 
-		private async Task InitializeAsync()
-		{
-			try
-			{
-				ProgressControl.IsVisible = true;
-				ProgressControl.Title = "Loading";
-				ProgressControl.Message = "Initialising seismic data...";
+        [ObservableProperty]
+        private DateTime _selectedDate = DateTime.Now;
 
-				await InitializeMapAsync();
-				await LoadSeismologyDataAsync();
+        [ObservableProperty]
+        private ProgressControlViewModel _progressControl = new();
 
-				UpdateMapFilter();
-			}
-			catch (Exception ex)
-			{
-				await _messageService.ShowAsync($"Startup Error: {ex.Message}", MessageDialogType.Error);
-			}
-			finally
-			{
-				ProgressControl.IsVisible = false;
-			}
-		}
+        public bool IsDarkTheme
+        {
+            get => _isDarkTheme;
+            set
+            {
+                if (SetProperty(ref _isDarkTheme, value))
+                    ApplyMapTheme();
+            }
+        }
 
-		//private async Task InitializeAsync()
-		//{
-		//	try
-		//	{
-		//		ProgressControl.IsVisible = true;
-		//		ProgressControl.Title = "Loading";
-		//		ProgressControl.Message = "Initialising seismic data...";
+        #endregion
 
-		//		await InitializeMapAsync();
-		//		await LoadSeismologyDataAsync();
+        #region Constructor
 
-		//		// 3. Add points to the map
-		//		// TEST LOGIC: Find the most recent date that actually HAS valid earthquakes (magnitude > 0)
-		//		var latesteismicActivities = SeismicActivities
-		//			.Where(x => x.MagnitudeValue > 0)
-		//			.OrderByDescending(x => x.Time).ToList();
+        public SeismologyPageViewModel(
+            ProgressControlViewModel progressControl,
+            IMessageService messageService,
+            IIpmaService apiClient,
+            IMapper mapper)
+        {
+            PageName = ApplicationPageNames.Seismology;
+            _progressControl = progressControl;
+            _messageService = messageService;
+            _mapper = mapper;
+            _apiClient = apiClient;
 
+            Map = new Mapsui.Map();
+            _ = InitializeAsync();
+        }
 
-		//		// Fallback: show everything without date filter if no valid magnitudes are found
-		//		AddSeismicLayerToMap(latesteismicActivities);
+        public SeismologyPageViewModel()
+        {
+            if (Design.IsDesignMode)
+            {
+                Map = new Mapsui.Map();
+                PageName = ApplicationPageNames.Seismology;
+            }
+        }
 
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		await _messageService.ShowAsync($"Startup Error: {ex.Message}", MessageDialogType.Error);
-		//	}
-		//	finally
-		//	{
-		//		ProgressControl.IsVisible = false;
-		//	}
-		//}
+        #endregion
 
-		private async Task InitializeMapAsync()
-		{
-			try
-			{
-				var osmLayer = await Task.Run(() => Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
-				osmLayer.Name = "OSM";
-				Map.Layers.Add(osmLayer);
+        #region Initialization
 
-				// Center on Portugal
-				var portugalCenter = new Mapsui.MPoint(-770000, 4780000);
-				Map.Navigator.CenterOnAndZoomTo(portugalCenter, Map.Navigator.Resolutions[7]);
+        private async Task InitializeAsync()
+        {
+            try
+            {
+                ProgressControl.IsVisible = true;
+                ProgressControl.Title = "Loading";
+                ProgressControl.Message = "Initialising seismic data...";
 
-				// Limits
-				var portugalExtent = new Mapsui.MRect(-1500000, 4200000, -300000, 5400000);
-				Map.Navigator.OverridePanBounds = portugalExtent;
+                await InitializeMapAsync();
+                await LoadSeismologyDataAsync();
+                UpdateMapFilter();
+            }
+            catch (Exception ex)
+            {
+                await _messageService.ShowAsync($"Startup Error: {ex.Message}", MessageDialogType.Error);
+            }
+            finally
+            {
+                ProgressControl.IsVisible = false;
+            }
+        }
 
-				Map.RefreshGraphics();
-			}
-			catch (Exception ex)
-			{
-				await _messageService.ShowAsync($"Map Error: {ex.Message}", MessageDialogType.Error);
-			}
-		}
+        private async Task InitializeMapAsync()
+        {
+            try
+            {
+                ApplyMapTheme();
 
-		private void AddSeismicLayerToMap(List<SeismicActivityDto> events, DateTime targetDate)
-		{
-			var features = new List<IFeature>();
+                // Center on Portugal
+                var portugalCenter = new Mapsui.MPoint(-770000, 4780000);
+                Map.Navigator.CenterOnAndZoomTo(portugalCenter, Map.Navigator.Resolutions[7]);
 
-			foreach (var sismo in events)
-			{
-				// Filter by selected date
-				if (sismo.Time.Date != targetDate.Date) continue;
+                // Pan limits
+                var portugalExtent = new Mapsui.MRect(-1500000, 4200000, -300000, 5400000);
+                Map.Navigator.OverridePanBounds = portugalExtent;
 
-				// Skip invalid data
-				if (sismo.MagnitudeValue == null || sismo.MagnitudeValue <= 0) continue;
+                Map.RefreshGraphics();
+            }
+            catch (Exception ex)
+            {
+                await _messageService.ShowAsync($"Map Error: {ex.Message}", MessageDialogType.Error);
+            }
+        }
 
-				var point = SphericalMercator.FromLonLat(sismo.Lon, sismo.Lat).ToMPoint();
-				var feature = new PointFeature(point);
+        #endregion
 
-				var location = !string.IsNullOrEmpty(sismo.Local) ? sismo.Local : sismo.ObservedRegion;
-				var intensity = !string.IsNullOrEmpty(sismo.Degree) ? $" | Intensity: {sismo.Degree}" : "";
-				var infoText = $"{location}\nMag: {sismo.Magnitude}{intensity}";
+        #region Theme
 
-				var scale = Math.Max(0.8, sismo.MagnitudeValue.Value / 2.5);
-				var color = GetColorByDegree(sismo.Degree);
+        private void ApplyMapTheme()
+        {
+            // Remove previous base layers
+            if (_baseLayer != null) Map.Layers.Remove(_baseLayer);
+            if (_labelLayer != null) Map.Layers.Remove(_labelLayer);
 
-				feature.Styles.Add(new SymbolStyle
-				{
-					SymbolScale = scale,
-					SymbolType = SymbolType.Ellipse,
-					Fill = new Brush(color),
-					Outline = new Pen(Color.Black, 0.5)
-				});
+            if (IsDarkTheme)
+            {
+                _baseLayer = new TileLayer(new HttpTileSource(
+                    new GlobalSphericalMercator(),
+                    "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+                    name: "Carto Dark Matter"));
 
-				feature.Styles.Add(new LabelStyle
-				{
-					Text = infoText,
-					ForeColor = Color.Black,
-					BackColor = new Brush(Color.FromArgb(180, 255, 255, 255)),
-					Font = new Font { Size = 11 },
-					HorizontalAlignment = LabelStyle.HorizontalAlignmentEnum.Left,
-					Offset = new Offset(15, 0),
-					CollisionDetection = true
-				});
+                _labelLayer = new TileLayer(new HttpTileSource(
+                    new GlobalSphericalMercator(),
+                    "https://basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png",
+                    name: "Carto Dark Labels"));
+            }
+            else
+            {
+                _baseLayer = Mapsui.Tiling.OpenStreetMap.CreateTileLayer();
+                _baseLayer.Name = "OSM Light";
+                _labelLayer = null;
+            }
 
-				features.Add(feature);
-			}
+            // Insert base layers at bottom
+            Map.Layers.Insert(0, _baseLayer);
+            if (_labelLayer != null)
+                Map.Layers.Insert(1, _labelLayer);
 
-			var oldLayer = Map.Layers.FirstOrDefault(l => l.Name == "Sismos");
-			if (oldLayer != null) Map.Layers.Remove(oldLayer);
+            Map.RefreshGraphics();
+        }
 
-			Map.Layers.Add(new MemoryLayer { Name = "Sismos", Features = features });
-			Map.RefreshGraphics();
-		}
+        #endregion
 
-		private Color GetColorByDegree(string? degree)
-		{
-			if (string.IsNullOrEmpty(degree))
-				return Color.FromArgb(180, 255, 0, 0); // Default Red (Not felt)
+        #region Seismic Layer
 
-			// Normaliza para facilitar (converte romanos para números se necessário)
-			var d = degree.ToUpper().Trim();
+        private void AddSeismicLayerToMap(List<SeismicActivityDto> events)
+        {
+            var features = new List<IFeature>();
 
-			return d switch
-			{
-				"I" or "1" or "II" or "2" => Color.FromArgb(200, 50, 205, 50),   // LimeGreen
-				"III" or "3" => Color.FromArgb(200, 255, 215, 0),  // Gold
-				"IV" or "4" => Color.FromArgb(200, 255, 140, 0),  // DarkOrange
-				"V" or "5" => Color.FromArgb(220, 255, 69, 0),   // OrangeRed
-				"VI" or "6" or "VII" or "7" => Color.FromArgb(255, 139, 0, 0), // DarkRed
-				_ => Color.FromArgb(255, 75, 0, 130)                           // Indigo (Very strong/Unknown)
-			};
-		}
+            foreach (var earthquake in events)
+            {
+                if (earthquake.MagnitudeValue == null || earthquake.MagnitudeValue <= 0)
+                    continue;
 
-		partial void OnSelectedDateChanged(DateTime value)
-		{
-			UpdateMapFilter();
-		}
+                var point = SphericalMercator.FromLonLat(earthquake.Lon, earthquake.Lat).ToMPoint();
+                var feature = new PointFeature(point);
 
-		private void UpdateMapFilter()
-		{
-			if (SeismicActivities == null) return;
+                var location = !string.IsNullOrEmpty(earthquake.Local)
+                    ? earthquake.Local
+                    : earthquake.ObservedRegion;
 
-			// Filters the list and updates the map
-			AddSeismicLayerToMap(SeismicActivities, SelectedDate);
-		}
+                var intensity = !string.IsNullOrEmpty(earthquake.Degree)
+                    ? $" | Intensity: {earthquake.Degree}"
+                    : "";
 
-		#region API
-		private async Task LoadSeismologyDataAsync()
-		{
-			SeismicActivities.Clear();
-			var response = await _apiClient.GetSeismicAsync(7);
+                var infoText = $"{location}\nMag: {earthquake.Magnitude}{intensity}";
 
-			if (response?.Data != null)
-			{
-				var mapped = _mapper.Map<List<SeismicActivityDto>>(response.Data);
-				SeismicActivities.AddRange(mapped);
-			}
-		}
-		#endregion
-	}
+                var scale = Math.Max(0.8, earthquake.MagnitudeValue.Value / 2.5);
+                var degree = !string.IsNullOrEmpty(earthquake.Degree)
+                    ? earthquake.Degree
+                    : GetDegreeFromMagnitude(earthquake.MagnitudeValue.Value);
+
+                var color = GetColorByDegree(degree);
+
+                feature.Styles.Add(new SymbolStyle
+                {
+                    SymbolScale = scale,
+                    SymbolType = SymbolType.Ellipse,
+                    Fill = new Brush(color),
+                    Outline = new Pen(Color.Black, 0.5)
+                });
+
+                feature.Styles.Add(new LabelStyle
+                {
+                    Text = infoText,
+                    ForeColor = Color.Black,
+                    BackColor = new Brush(Color.FromArgb(220, 255, 255, 255)),
+                    Font = new Font { Size = 11 },
+                    HorizontalAlignment = LabelStyle.HorizontalAlignmentEnum.Left,
+                    VerticalAlignment = LabelStyle.VerticalAlignmentEnum.Center,
+                    Offset = new Offset(20, 0),
+                    CollisionDetection = true,
+                });
+
+                features.Add(feature);
+            }
+
+            var oldLayer = Map.Layers.FirstOrDefault(l => l.Name == "Earthquakes");
+            if (oldLayer != null) Map.Layers.Remove(oldLayer);
+
+            Map.Layers.Add(new MemoryLayer { Name = "Earthquakes", Features = features });
+            Map.RefreshGraphics();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private string GetDegreeFromMagnitude(double mag)
+        {
+            return mag switch
+            {
+                < 2.0 => "I",
+                < 3.0 => "II",
+                < 4.0 => "III",
+                < 4.5 => "IV",
+                < 5.0 => "V",
+                < 5.5 => "VI",
+                < 6.0 => "VII",
+                < 6.5 => "VIII",
+                < 7.0 => "IX",
+                _ => "X"
+            };
+        }
+
+        private Color GetColorByDegree(string? degree)
+        {
+            if (string.IsNullOrEmpty(degree))
+            {
+                return Color.FromArgb(180, 255, 0, 0);
+            }
+
+            var d = degree.ToUpper().Trim();
+
+            return d switch
+            {
+                "I" or "1" or "II" or "2" => Color.FromArgb(200, 50, 205, 50),
+                "III" or "3" => Color.FromArgb(200, 255, 215, 0),
+                "IV" or "4" => Color.FromArgb(200, 255, 140, 0),
+                "V" or "5" => Color.FromArgb(220, 255, 69, 0),
+                "VI" or "6" or "VII" or "7" => Color.FromArgb(255, 139, 0, 0),
+                _ => Color.FromArgb(255, 75, 0, 130)
+            };
+        }
+
+        partial void OnSelectedDateChanged(DateTime value)
+        {
+            try
+            {
+                UpdateMapFilter();
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowAsync($"Error while applying theme\n{ex.Message}", MessageDialogType.Error);
+            }
+        }
+
+        private void UpdateMapFilter()
+        {
+            if (SeismicActivities == null) return;
+
+            var filteredEvents = SeismicActivities
+                .Where(s => s.Time.Date == SelectedDate.Date)
+                .ToList();
+
+            AddSeismicLayerToMap(filteredEvents);
+        }
+
+        #endregion
+
+        #region API
+
+        private async Task LoadSeismologyDataAsync()
+        {
+            SeismicActivities.Clear();
+            var response = await _apiClient.GetSeismicAsync(7);
+
+            if (response?.Data != null)
+            {
+                var mapped = _mapper.Map<List<SeismicActivityDto>>(response.Data);
+                SeismicActivities.AddRange(mapped);
+            }
+        }
+
+        #endregion
+    }
 }

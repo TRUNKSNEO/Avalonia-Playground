@@ -11,12 +11,17 @@
 	</Application.DataTemplates>
 
 	<Application.Styles>
-		<FluentTheme />
+		<FluentTheme/>
 		<StyleInclude Source="avares://MyAvalonia/Assets/Styles/DarkVintageTheme.axaml"/>
 		<StyleInclude Source="avares://FluentAvalonia.ProgressRing/Styling/Controls/ProgressRing.axaml" />
 	</Application.Styles>
 
 	<Application.Resources>
+		<!-- Accent principal -->
+		<Color x:Key="SystemAccentColor">#B4D400</Color>
+		<Color x:Key="SystemAccentColorDark2">#6F8800</Color>
+		<Color x:Key="SystemAccentColorLight1">#C6EA00</Color>
+		<Color x:Key="SystemAccentColorLight2">#D4FF00</Color>
 		<StaticResource x:Key="MsBoxBackground" ResourceKey="PanelBrush" />
 		<StaticResource x:Key="MsBoxForeground" ResourceKey="PrimaryBrush" />
 
