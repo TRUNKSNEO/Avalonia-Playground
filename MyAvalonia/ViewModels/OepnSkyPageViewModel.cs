@@ -438,8 +438,8 @@ namespace MyAvalonia.ViewModels
 
                 try
                 {
-                    // IMPORTANTE: >= 10 to avoid 429
-                    await Task.Delay(10000, token);
+                    // IMPORTANTE: >= 11 to avoid 429
+                    await Task.Delay(11000, token);
                 }
                 catch
                 {

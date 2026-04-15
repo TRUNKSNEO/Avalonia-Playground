@@ -44,7 +44,7 @@
 					</Button>
 					<Button Classes.active="{Binding Path=OepnSkyPageIsActive}" HorizontalAlignment="Stretch" Command="{Binding GoToOepnSkyCommand}">
 						<StackPanel Orientation="Horizontal">
-							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}"  Classes="icon" Content="&#xE002;" > </Label>
+							<Label FontFamily="{DynamicResource ResourceKey=PhosphorFill}" Classes="icon" Content="&#xE002;" > </Label>
 							<Label Content="Air traffic" IsVisible="{Binding Path=SideMenuExpanded}"></Label>
 						</StackPanel>
 					</Button>
