@@ -1,3 +1,6 @@
+
+
+
 # Avalonia-Playground
 Project created for learning Avalonia
 * Uses IPMA public API
@@ -5,7 +8,15 @@ Project created for learning Avalonia
     - Full working API CLient for IPMA data gathering
 * Work in progress
 
-![Demo Vid](./vid/v.mp4)
+https://github.com/user-attachments/assets/7c19e87b-f19f-4b34-be80-9c9ec726b354
+
+
+https://github.com/user-attachments/assets/9358b404-9c12-41af-93a4-12766cb33603
+
+
+https://github.com/user-attachments/assets/242f9357-5e1b-407b-aaac-23e9da8a7850
+
+
 
 ![w11](./imgs/w11.png)
 ![w10](./imgs/w10.png)
