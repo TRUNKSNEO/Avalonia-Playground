@@ -294,19 +294,22 @@ namespace OmniWatch.ViewModels
                     item.PrecipitationInformation = PrecepitationTypes.FirstOrDefault(x => x.IntensityLevel == item.PrecipitationIntensityClass)
                         ?? new PrecipitationDto { DescriptionPT = "---", IntensityLevel = -99 };
 
-                    // Link awareness alerts to this specific forecast day/area
+                    var dayStart = item.Date.Date;
+                    var dayEnd = item.Date.Date.AddDays(1).AddTicks(-1);
+
                     item.AwarnessInformation = AwarnessTypes
-                       .Where(a =>
-                       {
-                           if (SelectedLocation is LocationDto selectedCity)
-                           {
-                               return item.Date.Date >= a.StartTime.Date &&
-                                      item.Date.Date <= a.EndTime.Date &&
-                                      selectedCity.IdAreaAviso == a.Area;
-                           }
-                           return false;
-                       })
-                       .ToList();
+                        .Where(a =>
+                        {
+                            if (SelectedLocation is LocationDto selectedCity)
+                            {
+                                return a.StartTime <= dayEnd &&
+                                       a.EndTime >= dayStart &&
+                                       selectedCity.IdAreaAviso == a.Area;
+                            }
+                            return false;
+                        })
+                        .ToList();
+
 
                     tempList.Add(item);
                 }
@@ -316,6 +319,26 @@ namespace OmniWatch.ViewModels
 
             }
         }
+
+        partial void OnSelectedTabChanged(ForecastItemDto? value)
+        {
+            if (value == null || SelectedLocation is not LocationDto selectedCity)
+                return;
+
+            var dayStart = value.Date.Date;
+            var dayEnd = value.Date.Date.AddDays(1).AddTicks(-1);
+
+            value.AwarnessInformation = AwarnessTypes
+                .Where(a =>
+                    a.StartTime <= dayEnd &&
+                    a.EndTime >= dayStart &&
+                    selectedCity.IdAreaAviso == a.Area)
+                .ToList();
+
+            OnPropertyChanged(nameof(SelectedTab));
+        }
+
+
 
         #endregion
     }
