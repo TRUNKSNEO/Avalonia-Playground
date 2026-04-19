@@ -1,0 +1,33 @@
+name: Preview Build
+
+on:
+  push:
+    branches: [ "preview" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build -c Release --no-restore
+
+    - name: Publish
+      run: dotnet publish OmniWatch/OmniWatch.csproj -c Release -r win-x64 --self-contained true -o publish
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OmniWatch-Preview
+        path: publish
