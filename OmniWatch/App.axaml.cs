@@ -15,8 +15,10 @@ using OmniWatch.ViewModels;
 using OmniWatch.ViewModels.ProgressControl;
 using OmniWatch.ViewModels.Settings;
 using OmniWatch.Views;
+using OmniWatch.Views.Splash;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OmniWatch
 {
@@ -40,18 +42,16 @@ namespace OmniWatch
 
         public override void OnFrameworkInitializationCompleted()
         {
-
             var collection = new ServiceCollection();
 
             // IPMA
             collection.AddApplicationServices();
             collection.AddIntegrations();
 
-            // Settings 
+            // Settings / Core
             collection.AddSingleton<AppInitializer>();
             collection.AddSingleton<ISecretService, SecretService>();
             collection.AddSingleton<ISettingsService, SettingsService>();
-
 
             // ViewModels
             collection.AddSingleton<MainWindowViewModel>();
@@ -67,32 +67,39 @@ namespace OmniWatch
 
             _serviceProvider = collection.BuildServiceProvider();
 
-            // Settings initialization
-            var initializer = _serviceProvider.GetRequiredService<AppInitializer>();
-            initializer.Initialize();
-
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                DisableAvaloniaDataAnnotationValidation();
+                var splash = new SplashWindow();
 
-                desktop.MainWindow = new MainWindow
+                desktop.MainWindow = splash;
+
+                splash.Opened += async (_, __) =>
                 {
-                    DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>()
+                    await Task.Run(() =>
+                    {
+                        _serviceProvider.GetRequiredService<AppInitializer>().Initialize();
+                    });
+
+                    var main = new MainWindow
+                    {
+                        DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>()
+                    };
+
+                    main.Show();
+                    desktop.MainWindow = main;
+                    splash.Close();
                 };
             }
 
             base.OnFrameworkInitializationCompleted();
         }
-
-
         private void DisableAvaloniaDataAnnotationValidation()
         {
-            // Get an array of plugins to remove
-            var dataValidationPluginsToRemove =
-                BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+            var plugins = BindingPlugins.DataValidators
+                .OfType<DataAnnotationsValidationPlugin>()
+                .ToArray();
 
-            // remove each entry found
-            foreach (var plugin in dataValidationPluginsToRemove)
+            foreach (var plugin in plugins)
             {
                 BindingPlugins.DataValidators.Remove(plugin);
             }
