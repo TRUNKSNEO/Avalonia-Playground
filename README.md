@@ -9,7 +9,7 @@ Project created for learning Avalonia
 * Work in progress
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/quality_gate?project=omniwatch)](https://sonarcloud.io/summary/new_code?id=omniwatch)
-
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=omniwatch&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=omniwatch)
 
 https://github.com/user-attachments/assets/072676d2-6f82-44b8-8937-5a5f1913a80c
 
