@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BruTile.Predefined;
+﻿using BruTile.Predefined;
 using BruTile.Web;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mapsui;
