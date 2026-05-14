@@ -33,6 +33,12 @@ jobs:
           -o publish/win-x64
 
       # -----------------------------
+      # INSTALL WINDOWS SDK (NECESSÁRIO)
+      # -----------------------------
+      - name: Install Windows SDK
+        run: choco install windows-sdk-10-version-2004-all -y
+
+      # -----------------------------
       # DECODE CERTIFICATE
       # -----------------------------
       - name: Decode certificate
@@ -42,13 +48,14 @@ jobs:
           certutil -decode cert_base64.txt windows_cert.pfx
 
       # -----------------------------
-      # SIGN FILES (CAMINHO ABSOLUTO)
+      # SIGN FILES (AUTO-DETECT SIGNTOOL)
       # -----------------------------
       - name: Sign binaries
         shell: pwsh
         run: |
           $password = "${{ secrets.WINDOWS_CERT_PASSWORD }}"
-          $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe"
+          $signtool = (Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\" -Recurse -Filter signtool.exe | Select-Object -First 1).FullName
+          Write-Host "Using signtool at: $signtool"
           $files = Get-ChildItem -Recurse publish/win-x64 -Include *.exe,*.dll
           foreach ($f in $files) {
             & $signtool sign /f windows_cert.pfx /p $password /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f.FullName
