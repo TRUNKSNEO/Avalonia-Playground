@@ -4,11 +4,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ============================
-  # WINDOWS BUILD + SIGN
-  # ============================
-  build-windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        # Define os RIDs e associa o runner adequado para cada um
+        include:
+          - rid: win-x64
+            os: windows-latest
+          - rid: linux-x64
+            os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
@@ -22,60 +28,61 @@ jobs:
       - name: Restore
         run: dotnet restore
 
-      - name: Publish Windows
+      # -----------------------------
+      # PUBLISH (COM VERSÃO)
+      # -----------------------------
+      - name: Publish
         run: >
           dotnet publish OmniWatch/OmniWatch.csproj
           -c Release
-          -r win-x64
+          -r ${{ matrix.rid }}
           --self-contained true
           -p:PublishSingleFile=true
           -p:DebugType=embedded
-          -o publish/win-x64
+          -p:Version=1.0.${{ github.run_number }}
+          -p:InformationalVersion=1.0.${{ github.run_number }}
+          -o publish/${{ matrix.rid }}
 
       # -----------------------------
-      # INSTALL WINDOWS SDK
+      # ASSINATURA (SOMENTE WINDOWS)
       # -----------------------------
-      - name: Install Windows SDK
-        run: choco install windows-sdk-10-version-2004-all -y
-
-      # -----------------------------
-      # DECODE CERTIFICATE
-      # -----------------------------
-      - name: Decode certificate
+      - name: Decode & Sign Windows Binaries
+        if: matrix.rid == 'win-x64'
         shell: pwsh
         run: |
           Set-Content -Path cert_base64.txt -Value "${{ secrets.WINDOWS_CERTIFICATE }}"
           certutil -decode cert_base64.txt windows_cert.pfx
-
-      # -----------------------------
-      # SIGN FILES (FORÇA X64)
-      # -----------------------------
-      - name: Sign binaries
-        shell: pwsh
-        run: |
           $password = "${{ secrets.WINDOWS_CERT_PASSWORD }}"
-          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\" -Recurse -Filter signtool.exe |
-                      Where-Object { $_.FullName -like "*x64*" } |
-                      Select-Object -First 1
-          Write-Host "Using signtool at: $($signtool.FullName)"
           $files = Get-ChildItem -Recurse publish/win-x64 -Include *.exe,*.dll
           foreach ($f in $files) {
             & $signtool.FullName sign /f windows_cert.pfx /p $password /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f.FullName
           }
+          Remove-Item windows_cert.pfx, cert_base64.txt
 
       # -----------------------------
-      # PACKAGE ZIP
+      # PACKAGE
       # -----------------------------
-      - name: Package Windows ZIP
+      - name: Package Linux
+        if: matrix.rid == 'linux-x64'
+        run: |
+          cd publish/linux-x64
+          tar -czf ../../OmniWatch-1.0.${{ github.run_number }}-linux-x64.tar.gz .
+
+      - name: Package Windows
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
         run: |
           cd publish/win-x64
-          powershell Compress-Archive -Path * -DestinationPath ../../OmniWatch-win-x64.zip
+          Compress-Archive -Path * -DestinationPath ../../OmniWatch-1.0.${{ github.run_number }}-win-x64.zip
 
-      - name: Upload Windows artifact
+      # -----------------------------
+      # UPLOAD ARTIFACTS
+      # -----------------------------
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OmniWatch-win-x64
-          path: OmniWatch-win-x64.zip
+          name: OmniWatch-${{ matrix.rid }}
+          path: OmniWatch-1.0.${{ github.run_number }}-${{ matrix.rid }}.*
 
   # ============================
   # LINUX BUILD
@@ -136,6 +143,9 @@ jobs:
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: OmniWatch 1.0.${{ github.run_number }}
+          body: |
+            🚀 Release Oficial
+            Versão: 1.0.${{ github.run_number }}
           files: artifacts/**/*
           draft: false
           prerelease: false
